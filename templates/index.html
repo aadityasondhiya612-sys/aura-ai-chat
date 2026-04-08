@@ -2,76 +2,111 @@
 <html>
 <head>
 <title>AURA AI</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
-body {
+* {
     margin: 0;
-    font-family: Arial;
-    background: linear-gradient(135deg, #0a0f2c, #050814);
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: radial-gradient(circle at top, #0f2027, #000);
     color: white;
 }
 
+/* Container */
 .container {
     display: flex;
     flex-direction: column;
     height: 100vh;
 }
 
+/* Header */
 .header {
     padding: 15px;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: bold;
+    border-bottom: 1px solid #222;
 }
 
+/* Chat area */
 .chat-box {
     flex: 1;
     overflow-y: auto;
-    padding: 10px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
 }
 
+/* Messages */
 .message {
-    padding: 10px;
-    margin: 10px;
-    border-radius: 10px;
-    max-width: 80%;
+    padding: 12px 15px;
+    margin: 8px 0;
+    border-radius: 12px;
+    max-width: 75%;
+    line-height: 1.4;
 }
 
 .user {
-    background: #1e90ff;
+    background: linear-gradient(135deg, #00c6ff, #0072ff);
     align-self: flex-end;
 }
 
 .bot {
-    background: #333;
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(10px);
     align-self: flex-start;
 }
 
+/* Input */
 .input-box {
     display: flex;
     padding: 10px;
-    background: #111;
+    border-top: 1px solid #222;
+    background: #000;
 }
 
 input {
     flex: 1;
-    padding: 10px;
-    border-radius: 5px;
+    padding: 12px;
+    border-radius: 8px;
     border: none;
+    outline: none;
+    background: #111;
+    color: white;
 }
 
 button {
     margin-left: 10px;
-    padding: 10px;
-    background: #00ff99;
+    padding: 12px 18px;
+    border-radius: 8px;
     border: none;
-    border-radius: 5px;
+    background: linear-gradient(135deg, #00ff99, #00cc66);
+    color: black;
+    font-weight: bold;
+}
+
+/* Scroll smooth */
+.chat-box::-webkit-scrollbar {
+    width: 5px;
+}
+.chat-box::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 10px;
 }
 </style>
+
 </head>
 
 <body>
 
 <div class="container">
-    <div class="header">AURA - Advanced AI Chat</div>
+
+    <div class="header">🚀 AURA - Advanced AI</div>
 
     <div id="chat" class="chat-box"></div>
 
@@ -79,6 +114,7 @@ button {
         <input id="msg" placeholder="Ask anything...">
         <button onclick="sendMsg()">Send</button>
     </div>
+
 </div>
 
 <script>
@@ -87,16 +123,22 @@ function sendMsg() {
     let chat = document.getElementById("chat");
 
     let userMsg = input.value;
-
     if(userMsg === "") return;
 
-    // user message
+    // user msg
     let userDiv = document.createElement("div");
     userDiv.className = "message user";
     userDiv.innerText = userMsg;
     chat.appendChild(userDiv);
 
-    // API call
+    chat.scrollTop = chat.scrollHeight;
+
+    // bot loading
+    let botDiv = document.createElement("div");
+    botDiv.className = "message bot";
+    botDiv.innerText = "Typing...";
+    chat.appendChild(botDiv);
+
     fetch("/chat", {
         method: "POST",
         headers: {
@@ -106,10 +148,7 @@ function sendMsg() {
     })
     .then(res => res.json())
     .then(data => {
-        let botDiv = document.createElement("div");
-        botDiv.className = "message bot";
         botDiv.innerText = data.reply;
-        chat.appendChild(botDiv);
         chat.scrollTop = chat.scrollHeight;
     });
 
