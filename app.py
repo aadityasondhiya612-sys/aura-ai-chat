@@ -4,7 +4,6 @@ import os
 
 app = Flask(__name__)
 
-# Gemini API key (Render se aayega)
 API_KEY = os.environ.get("GEMINI_API_KEY")
 
 @app.route('/')
@@ -15,7 +14,7 @@ def home():
 def chat():
     user_msg = request.json['message']
 
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={API_KEY}"
+    url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={API_KEY}"
 
     data = {
         "contents": [{
@@ -24,12 +23,12 @@ def chat():
     }
 
     response = requests.post(url, json=data)
-    result = response.json()
 
     try:
+        result = response.json()
         reply = result['candidates'][0]['content']['parts'][0]['text']
     except:
-        reply = "⚠️ Error aa gaya, phir try karo"
+        reply = "⚠️ API error (key ya config check karo)"
 
     return jsonify({"reply": reply})
 
