@@ -1,10 +1,9 @@
 from flask import Flask, render_template, request, jsonify
-import os
-from openai import OpenAI
+import requests
 
 app = Flask(__name__)
 
-client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+API_KEY = "YOUR_GEMINI_API_KEY"
 
 @app.route('/')
 def home():
@@ -14,23 +13,25 @@ def home():
 def chat():
     user_msg = request.json['message']
 
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={API_KEY}"
+
+    data = {
+        "contents": [{
+            "parts": [{"text": user_msg}]
+        }]
+    }
+
+    response = requests.post(url, json=data)
+    result = response.json()
+
     try:
-        response = client.chat.completions.create(
-            model="gpt-4.1-mini",
-            messages=[
-                {"role": "system", "content": "You are a helpful AI assistant."},
-                {"role": "user", "content": user_msg}
-            ]
-        )
-
-        reply = response.choices[0].message.content
-
-    except Exception as e:
-        reply = "Error: " + str(e)
+        reply = result['candidates'][0]['content']['parts'][0]['text']
+    except:
+        reply = "Error aa gaya, phir try karo"
 
     return jsonify({"reply": reply})
 
-
 if __name__ == "__main__":
+    import os
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
