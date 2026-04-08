@@ -1,9 +1,11 @@
 from flask import Flask, render_template, request, jsonify
 import requests
+import os
 
 app = Flask(__name__)
 
-API_KEY = "YOUR_GEMINI_API_KEY"
+# Gemini API key (Render se aayega)
+API_KEY = os.environ.get("GEMINI_API_KEY")
 
 @app.route('/')
 def home():
@@ -27,11 +29,10 @@ def chat():
     try:
         reply = result['candidates'][0]['content']['parts'][0]['text']
     except:
-        reply = "Error aa gaya, phir try karo"
+        reply = "⚠️ Error aa gaya, phir try karo"
 
     return jsonify({"reply": reply})
 
 if __name__ == "__main__":
-    import os
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
